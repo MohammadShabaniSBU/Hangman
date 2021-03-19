@@ -1,11 +1,20 @@
 import java.util.Scanner;
 import java.lang.Thread;
 import java.lang.InterruptedException;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class HangMan {
     public static void main(String[] args) {
-        while (true)
-            StartUpPage.display();
+        Load.load();
+        boolean status = true;
+        while (status) {
+            status = StartUpPage.display();
+            Save.saveAll();
+            Save.saveLeaderBoard();
+        }
     }
 }
 
@@ -56,9 +65,13 @@ class User {
     private int score;
 
     User(String username, String password) {
+        this(username, password, 0);
+    }
+
+    User(String username, String password, int score){
         this.username = username;
         this.password = password;
-        this.score = 0;
+        this.score = score;
     }
 
     public String getUsername() {
@@ -106,7 +119,10 @@ class Users {
     }
 
     public User[] getUsers() {
-        return users;
+        User[] temp = new User[this.count];
+        for (int i = 0; i < this.count; i++)
+            temp[i] = this.users[i];
+        return temp;
     }
 
     public int getCount() {
@@ -141,27 +157,28 @@ class Users {
                 }
     }
 
-    public void showLeaderboard() {
+    public String showLeaderboard() {
         this.sort();
         MyConsole.clearScreen();
-        System.out.printf("username-------score");
+        String leaderBoard = "username-----------------score";
         for (int i = 0; i < this.count; i++) {
-            System.out.println("");
             int length = users[i].getUsername().length();
-            System.out.print(users[i].getUsername());
+            leaderBoard += "\n" + users[i].getUsername();
             String dashes = "";
-            for (int j = 0; j < 15 - length; j++)
+            for (int j = 0; j < 25 - length; j++)
                 dashes += "-";
-            System.out.print(dashes + users[i].getScore());
+            leaderBoard += dashes + users[i].getScore();
         }
+        return leaderBoard;
     }
 }
 
 class StartUpPage {
-    public static void display() {
+    public static boolean display() {
         MyConsole.clearScreen();
         System.out.println("1. Sign Up");
         System.out.println("2. Login");
+        System.out.println("3. Exit");
         System.out.print("Enter your choice : ");
         System.out.flush();
         Scanner input = new Scanner(System.in);
@@ -169,10 +186,12 @@ class StartUpPage {
         switch (choice) {
             case 1:
                 SignUp.displaySignUpPage();
-                break;
+                return true;
             case 2:
                 Login.login();
-
+                return true;
+            default:
+                return false;
         }
     }
 }
@@ -221,9 +240,6 @@ class SignUp {
             }
         else
             Users.getInstance().add(new User(username, password));
-
-        StartUpPage.display();
-
     }
 
     private static boolean validateUsername(String username) {
@@ -271,7 +287,8 @@ class Login {
                 game = null;
                 break;
             case 2:
-                Users.getInstance().showLeaderboard();
+                MyConsole.clearScreen();
+                System.out.print(Users.getInstance().showLeaderboard());
                 try {
                     Thread.sleep(6000);
                 } catch (InterruptedException e) {
@@ -454,7 +471,7 @@ class Game {
                 }
 
         for (int i = 0; i < this.word.length(); i++)
-            if(letter == this.word.charAt(i))
+            if (letter == this.word.charAt(i))
                 this.status[i] = true;
 
         return true;
@@ -496,5 +513,44 @@ class Game {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
         }
+    }
+}
+
+class Save {
+    public static void saveAll() {
+        String written = "";
+        User[] users = Users.getInstance().getUsers();
+        int count = Users.getInstance().getCount();
+        written += count + "\n";
+        for (User user : users)
+            written += user.getUsername() + " " + user.getPassword() + " " + user.getScore() + "\n";
+        save("HangMan.txt", written);
+    }
+
+    public static void saveLeaderBoard(){
+        String written = Users.getInstance().showLeaderboard();
+        save("LeaderBoard.txt", written);
+    }
+
+    private static void save (String fileName, String written){
+        try {
+            File myFile = new File(fileName);
+            myFile.createNewFile();
+            FileWriter myWriter = new FileWriter(myFile);
+            myWriter.write(written);
+            myWriter.close();
+        } catch (IOException e) {}
+    }
+}
+
+class Load {
+    public static void load() {
+        File myFile = new File("HangMan.txt");
+        try {
+            Scanner input = new Scanner(myFile);
+            int count = input.nextInt();
+            for (int i = 0; i < count; i++)
+                Users.getInstance().add(new User(input.next(), input.next(), input.nextInt()));
+        } catch (FileNotFoundException e) {}
     }
 }
