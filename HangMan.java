@@ -385,12 +385,33 @@ class Game {
         this.user = user;
         int index = (int) (Math.random() * this.countOfWords);
         this.word = this.words[index];                                // choosing a random word
-        this.countOfMistakes = 0;
-        this.maxMistake = this.word.length() > 9 ? 14 : 7;
-        this.getRandomLetter = true;
         this.status = new boolean[this.word.length()];
+        varifyWord(this.word);
+        int length = length(this.word);
+        this.countOfMistakes = 0;
+        this.maxMistake = length > 9 ? 14 : 7;
+        this.getRandomLetter = true;
         this.choosenCharacters = new boolean[26];
 
+    }
+
+    private void varifyWord(String word) {
+
+        for (int i = 0; i < word.length(); i++)
+            if (word.charAt(i) == ' ')
+                this.status[i] = true;
+
+    }
+
+    private int length(String word){
+
+        int length = 0;
+
+        for (int i = 0; i < word.length(); i++)
+            if (word.charAt(i) != 0)
+                length++;
+
+        return length;
     }
 
     public static void print(int x, int y, String color, String message) {
