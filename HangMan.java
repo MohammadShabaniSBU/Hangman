@@ -348,6 +348,39 @@ class Game {
                 System.out.printf("%c ", i + 'a');
     }
 
+    public void showTable() {
+        String top = "\u2554\u2550";
+        for (int i = 0; i < this.maxMistake - 1; i++)
+            top += "\u2566\u2550";
+
+        String middle = "\u2551";
+        for (int i = 0; i < this.maxMistake; i++)
+            middle += " \u2551";
+
+        String buttom = "\u255A\u2550";
+        for (int i = 0; i < this.maxMistake - 1; i++)
+            buttom += "\u2569\u2550";
+
+        MyConsole.cursorGoTo(7, 8);
+        System.out.print(top + "\u2557");
+        MyConsole.cursorGoTo(8, 8);
+        System.out.print(middle);
+        MyConsole.cursorGoTo(9, 8);
+        System.out.print(buttom + "\u255D");
+
+        for(int i = 0; i < this.maxMistake; i++) {
+            MyConsole.cursorGoTo(8, 9 + 2 * i);
+            if (i < countOfMistakes) {
+                MyConsole.changrColor("red");
+                System.out.print("X");
+            } else {
+                MyConsole.changrColor("green");
+                System.out.print("V");
+            }
+            MyConsole.changrColor("default");
+        }
+    }
+
     public void play() {
         if (this.countOfMistakes == this.maxMistake) {
             this.lose();
@@ -367,6 +400,7 @@ class Game {
         this.showWord();
         this.showWood();
         this.showHuman();
+        this.showTable();
         this.showUsedChars();
         MyConsole.cursorGoTo(3, 8);
         System.out.print("Enter your character :  ");
@@ -376,11 +410,10 @@ class Game {
             if (!this.checkChar(guess.charAt(0)))
                 this.countOfMistakes++;
             this.choosenCharacters[guess.charAt(0) - 'a'] = true;
-            MyConsole.cursorGoTo(7, 8);
+            MyConsole.cursorGoTo(10, 8);
             System.out.printf("                 ");
-//            System.out.flush();
         }else{
-            MyConsole.cursorGoTo(7, 8);
+            MyConsole.cursorGoTo(10, 8);
             System.out.print("Invalid character");
             System.out.flush();
         }
@@ -408,10 +441,16 @@ class Game {
 
     private void win() {
         this.user.win();
+        MyConsole.cursorGoTo(10, 7);
+        System.out.printf("YOU WON :)");
+        System.out.flush();
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {}
     }
 
     private void lose() {
-        MyConsole.cursorGoTo(7, 7);
+        MyConsole.cursorGoTo(10, 7);
         System.out.printf("YOU LOST :(");
         System.out.flush();
         try {
