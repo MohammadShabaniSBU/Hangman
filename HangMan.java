@@ -5,7 +5,7 @@ import java.lang.InterruptedException;
 public class HangMan {
     public static void main(String[] args) {
         while (true)
-        StartUpPage.display();
+            StartUpPage.display();
     }
 }
 
@@ -217,7 +217,8 @@ class SignUp {
         if (!status)
             try {
                 Thread.sleep(3000);
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {
+            }
         else
             Users.getInstance().add(new User(username, password));
 
@@ -273,7 +274,8 @@ class Login {
                 Users.getInstance().showLeaderboard();
                 try {
                     Thread.sleep(6000);
-                } catch (InterruptedException e) {}
+                } catch (InterruptedException e) {
+                }
         }
     }
 }
@@ -285,6 +287,7 @@ class Game {
     private String word;
     private int countOfMistakes;
     private int maxMistake;
+    private boolean getRandomLetter;
     private boolean[] status;
     private boolean[] choosenCharacters;
 
@@ -294,11 +297,12 @@ class Game {
         this.word = this.words[index];
         this.countOfMistakes = 0;
         this.maxMistake = this.word.length() > 9 ? 14 : 7;
+        this.getRandomLetter = true;
         this.status = new boolean[this.word.length()];
         this.choosenCharacters = new boolean[26];
     }
 
-    public void showWord() {
+    private void showWord() {
         MyConsole.cursorGoTo(1, 1);
         for (int i = 0; i < this.word.length(); i++)
             if (status[i] || this.word.charAt(i) == ' ')
@@ -308,13 +312,13 @@ class Game {
         System.out.flush();
     }
 
-    public void showWood() {
+    private void showWood() {
         MyConsole.cursorGoTo(3, 1);
         for (int i = 0; i < 5; i++)
             System.out.println("|");
     }
 
-    public void showHuman() {
+    private void showHuman() {
         int steps = this.maxMistake == 14 ? this.countOfMistakes / 2 : this.countOfMistakes;
         switch (steps) {
             case 7:
@@ -341,14 +345,14 @@ class Game {
         }
     }
 
-    public void showUsedChars() {
-        MyConsole.cursorGoTo(5, 8);
+    private void showUsedChars() {
+        MyConsole.cursorGoTo(6, 8);
         for (int i = 0; i < 26; i++)
             if (this.choosenCharacters[i])
                 System.out.printf("%c ", i + 'a');
     }
 
-    public void showTable() {
+    private void showTable() {
         String top = "\u2554\u2550";
         for (int i = 0; i < this.maxMistake - 1; i++)
             top += "\u2566\u2550";
@@ -361,15 +365,15 @@ class Game {
         for (int i = 0; i < this.maxMistake - 1; i++)
             buttom += "\u2569\u2550";
 
-        MyConsole.cursorGoTo(7, 8);
-        System.out.print(top + "\u2557");
         MyConsole.cursorGoTo(8, 8);
-        System.out.print(middle);
+        System.out.print(top + "\u2557");
         MyConsole.cursorGoTo(9, 8);
+        System.out.print(middle);
+        MyConsole.cursorGoTo(10, 8);
         System.out.print(buttom + "\u255D");
 
-        for(int i = 0; i < this.maxMistake; i++) {
-            MyConsole.cursorGoTo(8, 9 + 2 * i);
+        for (int i = 0; i < this.maxMistake; i++) {
+            MyConsole.cursorGoTo(9, 9 + 2 * i);
             if (i < countOfMistakes) {
                 MyConsole.changrColor("red");
                 System.out.print("X");
@@ -382,6 +386,17 @@ class Game {
     }
 
     public void play() {
+        this.showWord();
+        this.showWood();
+        this.showHuman();
+        this.showTable();
+        this.showUsedChars();
+        MyConsole.cursorGoTo(3, 8);
+        System.out.print("Enter your character :  ");
+        MyConsole.cursorGoTo(4, 8);
+        System.out.print("Enter 0 to get a random letter with 10 score.");
+        MyConsole.cursorGoTo(3, 31);
+
         if (this.countOfMistakes == this.maxMistake) {
             this.lose();
             return;
@@ -397,29 +412,52 @@ class Game {
             return;
         }
 
-        this.showWord();
-        this.showWood();
-        this.showHuman();
-        this.showTable();
-        this.showUsedChars();
-        MyConsole.cursorGoTo(3, 8);
-        System.out.print("Enter your character :  ");
-        MyConsole.cursorGoTo(3, 31);
         String guess = (new Scanner(System.in)).next();
-        if(this.validateChar(guess.charAt(0)) && guess.charAt(0) >= 'a' && guess.charAt(0) <= 'z') {
+        if (this.validateChar(guess.charAt(0)) && guess.charAt(0) >= 'a' && guess.charAt(0) <= 'z') {
             if (!this.checkChar(guess.charAt(0)))
                 this.countOfMistakes++;
             this.choosenCharacters[guess.charAt(0) - 'a'] = true;
-            MyConsole.cursorGoTo(10, 8);
-            System.out.printf("                 ");
-        }else{
-            MyConsole.cursorGoTo(10, 8);
+            MyConsole.cursorGoTo(11, 8);
+            System.out.printf("                                            ");
+        } else if (guess.charAt(0) == '0') {
+            if (!this.getLetter()) {
+                MyConsole.cursorGoTo(11, 8);
+                System.out.print("You don't have enough score.");
+                System.out.flush();
+            }
+        } else {
+            MyConsole.cursorGoTo(11, 8);
             System.out.print("Invalid character");
             System.out.flush();
         }
-
         this.play();
+    }
 
+    private boolean getLetter() {
+
+        if (!this.user.getARandomLetter())
+            return false;
+
+        int countOfLetters = 0;
+        for (boolean status : this.status)
+            if (!status)
+                countOfLetters++;
+        int index = (int) (Math.random() * countOfLetters);
+        int temp = 0;
+
+        char letter = 'a';
+        for (int i = 0; i < this.status.length; i++)
+            if (!this.status[i])
+                if (index == temp++) {
+                    letter = this.word.charAt(i);
+                    this.choosenCharacters[letter - 'a'] = true;
+                }
+
+        for (int i = 0; i < this.word.length(); i++)
+            if(letter == this.word.charAt(i))
+                this.status[i] = true;
+
+        return true;
     }
 
     private boolean validateChar(char guess) {
@@ -441,20 +479,22 @@ class Game {
 
     private void win() {
         this.user.win();
-        MyConsole.cursorGoTo(10, 7);
+        MyConsole.cursorGoTo(11, 8);
         System.out.printf("YOU WON :)");
         System.out.flush();
         try {
             Thread.sleep(3000);
-        } catch (InterruptedException e) {}
+        } catch (InterruptedException e) {
+        }
     }
 
     private void lose() {
-        MyConsole.cursorGoTo(10, 7);
+        MyConsole.cursorGoTo(11, 8);
         System.out.printf("YOU LOST :(");
         System.out.flush();
         try {
             Thread.sleep(3000);
-        } catch (InterruptedException e) {}
+        } catch (InterruptedException e) {
+        }
     }
 }
