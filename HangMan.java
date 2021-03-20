@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HangMan {
     public static void main(String[] args) {
@@ -292,11 +294,15 @@ class SignUp {
     }
 
     private static boolean validateUsername(String username) {
+
         return Users.getInstance().checkUsername(username);
+
     }
 
     private static boolean validatePassword(String password) {
-        return (password.length() >= 6);
+
+        return (password.length() >= 6 && Pattern.compile("^[A-Za-z0-9]*[^A-Za-z0-9]+.*$").matcher(password).find());
+
     }
 }
 
@@ -310,7 +316,7 @@ class Login {
         System.out.print("Enter your username : ");
         String username = input.nextLine();
         
-        System.out.print("\nEnter your password : ");
+        System.out.print("Enter your password : ");
         String password = input.nextLine();
         
         User[] users = Users.getInstance().getUsers();     // getting users
@@ -437,9 +443,11 @@ class Game {
 
     private void showWood() {
 
+        MyConsole.changeColor("boldBlue");
         MyConsole.cursorGoTo(3, 1);
         for (int i = 0; i < 5; i++)
             System.out.println("|");
+        MyConsole.changeColor("default");
 
     }
 
@@ -449,19 +457,19 @@ class Game {
 
         switch (steps) {
             case 7:
-                print(6, 4, "", "\\");
+                print(6, 5, "boldGreen", "\\");
             case 6:
-                print(6, 3, "", "/");
+                print(6, 3, "boldGreen", "/");
             case 5:
-                print(5, 5, "", "\\");
+                print(5, 5, "boldGreen", "\\");
             case 4:
-                print(5, 4, "", "|");
+                print(5, 4, "boldGreen", "|");
             case 3:
-                print(5, 3, "", "/");
+                print(5, 3, "boldGreen", "/");
             case 2:
-                print(4, 3, "", "O");
+                print(4, 4, "boldGreen", "O");
             case 1:
-                print(3, 3, "", "|");
+                print(3, 4, "boldRed", "|");
 
         }
     }
