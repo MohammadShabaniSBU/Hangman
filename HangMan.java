@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.io.Console;
 
 public class HangMan {
     public static void main(String[] args) {
@@ -264,7 +265,7 @@ class SignUp {
         String username = input.nextLine().trim();
 
         System.out.print("Enter your password : ");
-        String password = input.nextLine().trim();
+        String password = String.copyValueOf(System.console().readPassword());
 
         signUpUser(username, password);
         
@@ -317,7 +318,7 @@ class Login {
         String username = input.nextLine();
         
         System.out.print("Enter your password : ");
-        String password = input.nextLine();
+        String password = String.copyValueOf(System.console().readPassword());
         
         User[] users = Users.getInstance().getUsers();     // getting users
         int count = Users.getInstance().getCount();
