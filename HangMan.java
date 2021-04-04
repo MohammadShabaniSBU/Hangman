@@ -27,8 +27,10 @@ public class HangMan {
 }
 
 class MyConsole {
-    private static String[] colors = {"default", "red", "boldRed", "green", "boldGreen", "yellow", "boldYellow", "blue", "boldBlue"};
-    private static String[] colorCodes = {"[0m", "[0;31m", "[1;31m", "[0;32m", "[1;32m", "[0;33m", "[1;33m", "[0;34m", "[1;34m"};
+    private static String[] colors = {"default", "red", "boldRed", "green", "boldGreen", "yellow", "boldYellow",
+            "blue", "boldBlue", "purple", "boldPurple"};
+    private static String[] colorCodes = {"[0m", "[0;31m", "[1;31m", "[0;32m", "[1;32m", "[0;33m", "[1;33m",
+            "[0;34m", "[1;34m", "[0;35m", "[1;35m"};
 
     public static void changeColor(String color) {
 
@@ -65,6 +67,14 @@ class MyConsole {
         return index;
     }
 
+    public static void print(int x, int y, String color, String message) {
+
+        MyConsole.cursorGoTo(x, y);
+        MyConsole.changeColor(color);
+        System.out.print(message);
+        MyConsole.changeColor("default");
+
+    }
 /*
     public static int getLines() {
         return Integer.parseInt(System.getenv("LINES"));        // getting count of lines and columns of the window (only Unix system)
@@ -222,12 +232,11 @@ class StartUpPage {
     public static boolean display() {
         
         MyConsole.clearScreen();
-        
-        System.out.println("1. Sign Up");
-        System.out.println("2. Login");
-        System.out.println("3. Exit");
-        System.out.print("Enter your choice : ");
-        
+        MyConsole.print(3, 5,"blue", "1. Sign Up");
+        MyConsole.print(4, 5, "blue", "2. Login");
+        MyConsole.print(5, 5, "red", "3. Exit");
+        MyConsole.print(7, 7, "green", "Enter your action : ");
+
         Scanner input = new Scanner(System.in);
         int choice = input.nextInt();
         
@@ -261,10 +270,10 @@ class SignUp {
         Scanner input = new Scanner(System.in);
         MyConsole.clearScreen();
 
-        System.out.print("Enter your username : ");
+        MyConsole.print(3, 5,"blue", "Enter your username : ");
         String username = input.nextLine().trim();
 
-        System.out.print("Enter your password : ");
+        MyConsole.print(4, 5,"blue", "Enter your password : ");
         String password = String.copyValueOf(System.console().readPassword());
 
         signUpUser(username, password);
@@ -277,12 +286,16 @@ class SignUp {
 
         if (!validateUsername(username)) {
             status = false;
-            System.out.println("Invalid username. Your username had been chosen.");
+            MyConsole.print(6, 7, "red", "Invalid username. Your username had been chosen.");
         }
 
         if (!validatePassword(password)) {
-            status = false;
-            System.out.println("Invalid password. Your password has to contain alphabets, numbers and special characters and it must be more than 6 characters.");
+            if(status)
+                MyConsole.print(6, 7, "red", "Invalid password. Your password has to contain " +
+                    "alphabets, numbers and special characters and it must be more than 6 characters.");
+            else
+                MyConsole.print(8, 7, "red", "Invalid password. Your password has to contain " +
+                        "alphabets, numbers and special characters and it must be more than 6 characters.");
         }
         
         if (!status)
@@ -308,16 +321,16 @@ class SignUp {
 }
 
 class Login {
-    public static boolean login() {
+    public static void login() {
         
         MyConsole.clearScreen();
         
         Scanner input = new Scanner(System.in);
         
-        System.out.print("Enter your username : ");
+        MyConsole.print(3, 5,"blue", "Enter your username : ");
         String username = input.nextLine();
         
-        System.out.print("Enter your password : ");
+        MyConsole.print(4, 5,"blue", "Enter your password : ");
         String password = String.copyValueOf(System.console().readPassword());
         
         User[] users = Users.getInstance().getUsers();     // getting users
@@ -328,11 +341,14 @@ class Login {
                 if (users[i].getPassword().equals(password)) {
                     
                     loginPage(users[i]);                   // redirecting to login page
-                    return true;
-                
+                    return;
+
                 }
-        
-        return false;
+
+        try {
+            MyConsole.print(6, 7, "red", "Invalid username or password :(");
+            Thread.sleep(4000);
+        } catch (Exception e) {}
     }
 
     private static void loginPage(User user) {
@@ -340,10 +356,10 @@ class Login {
         MyConsole.clearScreen();
         
         Scanner input = new Scanner(System.in);
-        
-        System.out.println("1. Start Game");
-        System.out.println("2. Show Leaderboard");
-        System.out.print("Enter your choice : ");
+
+        MyConsole.print(3, 5, "blue", "1. Start Game");
+        MyConsole.print(4, 5, "blue", "2. Show Leaderboard");
+        MyConsole.print(6, 7, "green", "Enter your choice : ");
         int choice = input.nextInt();
         
         switch (choice) {
@@ -432,7 +448,8 @@ class Game {
 
     private void showWord() {
 
-        MyConsole.cursorGoTo(1, 1);
+        MyConsole.cursorGoTo(3, 5);
+        MyConsole.changeColor("blue");
 
         for (int i = 0; i < this.word.length(); i++)
             if (status[i] || this.word.charAt(i) == ' ')
@@ -440,15 +457,13 @@ class Game {
             else
                 System.out.printf("-");
 
+        MyConsole.changeColor("default");
     }
 
     private void showWood() {
 
-        MyConsole.changeColor("boldBlue");
-        MyConsole.cursorGoTo(3, 1);
         for (int i = 0; i < 5; i++)
-            System.out.println("|");
-        MyConsole.changeColor("default");
+            MyConsole.print(6 + i, 3,"boldBlue", "|");
 
     }
 
@@ -458,26 +473,26 @@ class Game {
 
         switch (steps) {
             case 7:
-                print(6, 5, "boldGreen", "\\");
+                print(9, 8, "boldGreen", "\\");
             case 6:
-                print(6, 3, "boldGreen", "/");
+                print(9, 6, "boldGreen", "/");
             case 5:
-                print(5, 5, "boldGreen", "\\");
+                print(8, 8, "boldGreen", "\\");
             case 4:
-                print(5, 4, "boldGreen", "|");
+                print(8, 7, "boldGreen", "|");
             case 3:
-                print(5, 3, "boldGreen", "/");
+                print(8, 6, "boldGreen", "/");
             case 2:
-                print(4, 4, "boldGreen", "O");
+                print(7, 7, "boldGreen", "O");
             case 1:
-                print(3, 4, "boldRed", "|");
+                print(6, 7, "boldRed", "|");
 
         }
     }
 
     private void showUsedChars() {
 
-        MyConsole.cursorGoTo(6, 8);
+        MyConsole.cursorGoTo(9, 13);
 
         for (int i = 0; i < 26; i++)
             if (this.choosenCharacters[i])
@@ -498,13 +513,13 @@ class Game {
         for (int i = 0; i < this.maxMistake - 1; i++)
             buttom += "\u2569\u2550";
 
-        print(8, 8, "yellow", top + "\u2557");
-        print(9, 8, "yellow", middle);
-        print(10, 8, "yellow", buttom + "\u255D");
+        print(11, 13, "yellow", top + "\u2557");
+        print(12, 13, "yellow", middle);
+        print(13, 13, "yellow", buttom + "\u255D");
 
         for (int i = 0; i < this.maxMistake; i++) {
 
-            MyConsole.cursorGoTo(9, 9 + 2 * i);
+            MyConsole.cursorGoTo(12, 14 + 2 * i);
 
             if (i < countOfMistakes) {
 
@@ -523,6 +538,12 @@ class Game {
 
     }
 
+    private void showScore() {
+
+        MyConsole.print(4, 25,"purple", "Score : " + this.user.getScore());
+
+    }
+
     public void play() {
 
         this.showWord();
@@ -530,10 +551,11 @@ class Game {
         this.showHuman();
         this.showTable();
         this.showUsedChars();
+        this.showScore();
 
-        print(3, 8, "", "Enter your character :  ");
-        print(4, 8, "", "Enter 0 to get a random letter with 10 score.");
-        MyConsole.cursorGoTo(3, 31);
+        print(6, 13, "", "Enter your character :  ");
+        print(7, 13, "", "Enter 0 to get a random letter with 10 score.");
+        MyConsole.cursorGoTo(6, 36);
 
         if (this.countOfMistakes == this.maxMistake) {   // checking user has lost 
             this.lose();
@@ -558,21 +580,21 @@ class Game {
                 this.countOfMistakes++;
 
             this.choosenCharacters[guess.charAt(0) - 'a'] = true;
-            print(11, 8, "default", "                                    ");
+            print(14, 13, "default", "                                    ");
 
         } else if (guess.charAt(0) == '0' && !this.getRandomLetter)   // checking for random character request
 
-            print(11, 8, "red", "You have got your one random letter.");
+            print(14, 13, "red", "You have got your one random letter.");
 
         else if (guess.charAt(0) == '0') {
 
             if (!this.getLetter())
-                print(11, 8, "red", "You don't have enough score.");
+                print(14, 13, "red", "You don't have enough score.");
             else
                 this.getRandomLetter = false;
 
         } else                                                                  // invalid input
-            print(11, 8, "red", "Invalid character.");
+            print(14, 13, "red", "Invalid character.");
 
         this.play();
     }
@@ -635,7 +657,7 @@ class Game {
     private void win() {
         
         this.user.win();       // adding 5 score
-        print(11, 8, "green", "YOU WON :)");
+        print(14, 13, "green", "YOU WON AND EARNED 5 SCORES :)");
         
         try {
             Thread.sleep(3000);
@@ -645,7 +667,8 @@ class Game {
 
     private void lose() {
         
-        print(11, 8, "red", "YOU LOST :(");
+        print(14, 13, "red", "YOU LOST :(");
+        print(15, 13,"blue", "The word was : " + this.word);
         
         try {
             Thread.sleep(3000);
