@@ -554,7 +554,7 @@ class Game {
         this.showScore();
 
         print(6, 13, "", "Enter your character :  ");
-        print(7, 13, "", "Enter 0 to get a random letter with 10 score.");
+        print(7, 13, "", "Enter 0 to get a random letter with 10 score.(just once)");
         MyConsole.cursorGoTo(6, 36);
 
         if (this.countOfMistakes == this.maxMistake) {   // checking user has lost 
